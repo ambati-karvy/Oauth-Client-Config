@@ -33,9 +33,12 @@ public class SecurityFilter extends OncePerRequestFilter {
                                     HttpServletResponse httpResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
     	
-    	
-    		//System.out.println(settings.getRefreshToken());
-    
+  
+    		System.out.println(httpRequest.isRequestedSessionIdValid());
+    		if(!httpRequest.isRequestedSessionIdValid()) {
+    			
+    			throw new RuntimeException();
+    		}
     		httpResponse.setHeader("Authorization", "Bearer "+settings.getRefreshToken());
     		
     	

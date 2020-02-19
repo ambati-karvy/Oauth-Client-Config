@@ -26,6 +26,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +36,7 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -79,22 +81,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
+    /*@Override
     protected void configure(final HttpSecurity http) throws Exception {
         http//.cors().and()
         // .addFilterBefore(customCorsFilter(), SessionManagementFilter.class)
-        .authorizeRequests().antMatchers("/login").permitAll()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+        .and()
+        .csrf()
+        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        .and()
+        .authorizeRequests().antMatchers("/login","/v1/get-xsrf","/health/**").permitAll()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .permitAll()
+                .antMatchers("/rest/roles/**").hasAuthority("RIGHT_EDIT_USERS")
                 .anyRequest().authenticated()
                 .and().formLogin()
+                .loginProcessingUrl("/login")
                 .loginPage("/login")
                 .successHandler(successHandler())
                 .failureHandler(failureHandler())
                 .permitAll()
                 .and().csrf().disable()
                 .logout().permitAll();
-    }
+    }*/
     
     /*CorsFilter1 customCorsFilter() {
     	CorsFilter1 filter = new CorsFilter1();
@@ -199,7 +209,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			System.out.println("authanticated");
             
             httpServletResponse.addHeader("Authorization", "Bearer "+restTemplate.getAccessToken());
-            httpServletResponse.addCookie(cookie);
+            //httpServletResponse.addCookie(cookie);
             httpServletResponse.setContentType("application/json");
         	httpServletResponse.getWriter().append("{message:Your are login successfully., status: 200}");
             httpServletResponse.setStatus(200);
